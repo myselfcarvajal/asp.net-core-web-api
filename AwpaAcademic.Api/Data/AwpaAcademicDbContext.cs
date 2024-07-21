@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AwpaAcademic.Api.Data;
 
-public class AwpaAcademicDB(DbContextOptions<AwpaAcademicDB> options) 
+public class AwpaAcademicDbContext(DbContextOptions<AwpaAcademicDbContext> options) 
     : DbContext(options)
 {
     public DbSet<User> Users { get; set; }
