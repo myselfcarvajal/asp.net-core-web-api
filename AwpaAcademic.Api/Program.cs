@@ -1,9 +1,23 @@
 using AwpaAcademic.Api.Data;
+using AwpaAcademic.Api.Mappers;
+using AwpaAcademic.Api.Mappers.Contracts;
+using AwpaAcademic.Api.Repositories;
+using AwpaAcademic.Api.Repositories.Contracts;
+using AwpaAcademic.Api.Services;
+using AwpaAcademic.Api.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserMapper, UserMapper>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 {
+    // add database connection
     var connString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<AwpaAcademicDbContext>(options =>
         options.UseSqlServer(connString));
@@ -11,8 +25,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
-    // Configure the HTTP request pipeline.
-    app.MapGet("/", () => "Hello World!");
+    app.MapControllers();
     app.Run();
 }
-
