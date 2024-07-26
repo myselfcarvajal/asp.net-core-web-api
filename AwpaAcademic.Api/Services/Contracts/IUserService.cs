@@ -5,12 +5,11 @@ namespace AwpaAcademic.Api.Services.Contracts;
 
 public interface IUserService
 {
-    public List<UserDto> GetAll();
-    public UserDto? GetById(int id);
+    Task<List<UserDto>> GetAllAsync();
+    Task<UserDto?> GetByIdAsync(int id);
 
-    public User AddUser(UserDto userDto);
-    public bool DeleteUser(int id);
-    public bool EditUser(int Id, UserDto userDto);
-
-    public void SaveChanges();
+    Task<User> AddUserAsync(UserDto userDto);
+    Task<bool> DeleteUserAsync(int id);
+    Task<bool> EditUserAsync(int Id, UserDto userDto);
+    Task SaveChangesAsync();
 }

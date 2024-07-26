@@ -20,23 +20,23 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult GetUsers()
+    public async Task<ActionResult> GetUsers()
     {
         ResultDto<List<UserDto>> result = new ResultDto<List<UserDto>>();
-        result.Results = _userService.GetAll();
+        result.Results = await _userService.GetAllAsync();
         result.StatusCode = Ok().StatusCode;
         return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public ActionResult GetUserById([FromRoute] int id)
+    public async Task<ActionResult> GetUserById([FromRoute] int id)
     {
-        UserDto? user = _userService.GetById(id);
+        UserDto? user = await _userService.GetByIdAsync(id);
         return user == null ? NotFound() : Ok(user);
     }
 
     [HttpPost]
-    public ActionResult AddUser([FromBody] CreateUserDto createUserDto)
+    public async Task<ActionResult> AddUser([FromBody] CreateUserDto createUserDto)
     {
         if (!ModelState.IsValid)
         {
@@ -59,8 +59,8 @@ public class UsersController : ControllerBase
                     DateTime.Now,
                     DateTime.Now
                 );
-                User addUser = _userService.AddUser(newUser);
-                _userService.SaveChanges();
+                User addUser = await _userService.AddUserAsync(newUser);
+                await _userService.SaveChangesAsync();
                 UserDto userDtoResult = _userMapper.MapToUserDto(addUser);
                 return Ok(userDtoResult);
             }
@@ -72,12 +72,13 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public ActionResult EditUser([FromRoute] int id, [FromBody] UpdateUserDto updateUserDto)
+    public async Task<ActionResult> EditUser([FromRoute] int id, [FromBody] UpdateUserDto updateUserDto)
     {
 
-        UserDto? existingUser = _userService.GetById(id);
+        UserDto? existingUser = await _userService.GetByIdAsync(id);
 
-        if (existingUser == null){
+        if (existingUser == null)
+        {
             return NotFound("User Not Found!!!!!");
         }
 
@@ -94,20 +95,20 @@ public class UsersController : ControllerBase
             UpdatedAt: DateTime.Now
         );
 
-        _userService.EditUser(id, updateUser);
-        _userService.SaveChanges();
+        await _userService.EditUserAsync(id, updateUser);
+        await _userService.SaveChangesAsync();
         return Ok(updateUser);
     }
 
     [HttpDelete("{id}")]
-    public ActionResult DeleteUser([FromRoute] int id)
+    public async Task<ActionResult> DeleteUser([FromRoute] int id)
     {
-        bool isDeleted = _userService.DeleteUser(id);
+        bool isDeleted = await _userService.DeleteUserAsync(id);
         if (!isDeleted)
         {
             return NotFound("User Not Fuond!!!!!");
         }
-        _userService.SaveChanges();
+
         return Ok("User Deleted Sucessfuly");
     }
 

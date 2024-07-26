@@ -2,5 +2,5 @@
 
 public interface IBaseRepository
 {
-    public void SaveChanges();
+    Task SaveChangesAsync();
 }

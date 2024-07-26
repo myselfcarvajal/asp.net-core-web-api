@@ -16,16 +16,16 @@ public class UserService : IUserService
         _userMapper = userMapper;
     }
 
-    public List<UserDto> GetAll()
+    public async Task<List<UserDto>> GetAllAsync()
     {
-        List<UserDto> users = new List<UserDto>();
-        users = _userRepository.GetAll().Select(u => _userMapper.MapToUserDto(u)).ToList();
+        List<User> _users = await _userRepository.GetAllAsync();
+        List<UserDto> users = _users.Select(u => _userMapper.MapToUserDto(u)).ToList();
         return users;
     }
 
-    public UserDto? GetById(int id)
+    public async Task<UserDto?> GetByIdAsync(int id)
     {
-        User? user = _userRepository.GetById(id);
+        User? user = await _userRepository.GetByIdAsync(id);
         if (user == null)
         {
             return null;
@@ -34,31 +34,31 @@ public class UserService : IUserService
         return userDto;
     }
 
-    public User AddUser(UserDto userDto)
+    public async Task<User> AddUserAsync(UserDto userDto)
     {
         User userEntity = _userMapper.MapToUser(userDto);
-        return _userRepository.AddUser(userEntity);
+        return await _userRepository.AddUserAsync(userEntity);
     }
 
-    public bool EditUser(int id, UserDto userDto)
+    public async Task<bool> EditUserAsync(int id, UserDto userDto)
     {
         User userEntity = _userMapper.MapToUser(userDto);
-        return _userRepository.EditUser(id, userEntity);
+        return await _userRepository.EditUserAsync(id, userEntity);
     }
 
-    public bool DeleteUser(int id)
+    public async Task<bool> DeleteUserAsync(int id)
     {
-        User? user = _userRepository.GetById(id);
+        User? user = await _userRepository.GetByIdAsync(id);
         if (user == null)
         {
             return false;
         }
-        _userRepository.DeleteUser(user);
+        await _userRepository.DeleteUserAsync(user);
         return true;
     }
 
-    public void SaveChanges()
+    public async Task SaveChangesAsync()
     {
-        _userRepository.SaveChanges();
+        await _userRepository.SaveChangesAsync();
     }
 }

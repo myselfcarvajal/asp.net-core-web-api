@@ -8,8 +8,8 @@ public abstract class BaseRepository : IBaseRepository
         _awpaAcademicDbContext = awpaAcademicDbContext;
     }
 
-    public void SaveChanges()
+    public async Task SaveChangesAsync()
     {
-        _awpaAcademicDbContext.SaveChanges();
+        await _awpaAcademicDbContext.SaveChangesAsync();
     }
 }

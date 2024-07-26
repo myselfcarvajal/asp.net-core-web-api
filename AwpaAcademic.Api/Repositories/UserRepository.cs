@@ -14,24 +14,25 @@ public class UserRepository : BaseRepository, IUserRepository
         _awpaAcademicDbContext = awpaAcademicDbContext;
     }
 
-    public List<User> GetAll()
+    public async Task<List<User>> GetAllAsync()
     {
-        return _awpaAcademicDbContext.Users.ToList();
+        return await _awpaAcademicDbContext.Users.ToListAsync();
     }
 
-    public User? GetById(int id)
+    public async Task<User?> GetByIdAsync(int id)
     {
-        return _awpaAcademicDbContext.Users.FirstOrDefault(u => u.Id == id);
+        return await _awpaAcademicDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public void DeleteUser(User user)
+    public async Task DeleteUserAsync(User user)
     {
         _awpaAcademicDbContext.Remove(user);
+        await _awpaAcademicDbContext.SaveChangesAsync();
     }
 
-    public bool EditUser(int Id, User user)
+    public async Task<bool> EditUserAsync(int Id, User user)
     {
-        User? existingEntity = _awpaAcademicDbContext.Users.Find(Id);
+        User? existingEntity = await _awpaAcademicDbContext.Users.FindAsync(Id);
         if (existingEntity == null)
         {
             return false;
@@ -45,9 +46,9 @@ public class UserRepository : BaseRepository, IUserRepository
         return true;
     }
 
-    public User AddUser(User user)
+    public async Task<User> AddUserAsync(User user)
     {
-        EntityEntry<User> x = _awpaAcademicDbContext.Add(user);
+        EntityEntry<User> x = await _awpaAcademicDbContext.AddAsync(user);
         return x.Entity;
     }
 }

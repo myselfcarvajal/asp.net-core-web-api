@@ -5,9 +5,9 @@ namespace AwpaAcademic.Api.Repositories.Contracts;
 
 public interface IUserRepository : IBaseRepository
 {
-    public List<User> GetAll();
-    public User? GetById(int id);
-    public User AddUser(User user);
-    public void DeleteUser(User user);
-    bool EditUser(int Id, User user);
+    Task<List<User>> GetAllAsync();
+    Task<User?> GetByIdAsync(int id);
+    Task<User> AddUserAsync(User user);
+    Task DeleteUserAsync(User user);
+    Task<bool> EditUserAsync(int Id, User user);
 }
