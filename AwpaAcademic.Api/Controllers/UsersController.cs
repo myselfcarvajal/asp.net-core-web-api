@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace AwpaAcademic.Api.Controllers;
 
 [ApiController]
-[Route("User")]
-public class UserController : ControllerBase
+[Route("Users")]
+public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
     private readonly IUserMapper _userMapper;
 
-    public UserController(IUserService userService, IUserMapper userMapper)
+    public UsersController(IUserService userService, IUserMapper userMapper)
     {
         _userService = userService;
         _userMapper = userMapper;
@@ -36,7 +36,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult AddUser([FromBody] UserDto userDto)
+    public ActionResult AddUser([FromBody] CreateUserDto createUserDto)
     {
         if (!ModelState.IsValid)
         {
@@ -46,9 +46,22 @@ public class UserController : ControllerBase
         {
             try
             {
-                User AddUser = _userService.AddUser(userDto);
+                // Convertir CreateUserDto a UserDto
+                UserDto newUser = new
+                (
+                    createUserDto.Id,
+                    createUserDto.Email,
+                    createUserDto.Passwd,
+                    createUserDto.Nombre,
+                    createUserDto.Apellido,
+                    createUserDto.RoleId,
+                    createUserDto.Codigofacultad,
+                    DateTime.Now,
+                    DateTime.Now
+                );
+                User addUser = _userService.AddUser(newUser);
                 _userService.SaveChanges();
-                UserDto userDtoResult = _userMapper.MapToUserDto(AddUser);
+                UserDto userDtoResult = _userMapper.MapToUserDto(addUser);
                 return Ok(userDtoResult);
             }
             catch (Exception e)
@@ -59,16 +72,31 @@ public class UserController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public ActionResult EditUser([FromRoute] int id, [FromBody] UserDto userDto)
+    public ActionResult EditUser([FromRoute] int id, [FromBody] UpdateUserDto updateUserDto)
     {
-        bool isEdited = _userService.EditUser(id, userDto);
-        if (!isEdited)
-        {
-            return NotFound("User Not Fuond!!!!!");
+
+        UserDto? existingUser = _userService.GetById(id);
+
+        if (existingUser == null){
+            return NotFound("User Not Found!!!!!");
         }
 
+        UserDto updateUser = new
+        (
+            updateUserDto.Id,
+            updateUserDto.Email,
+            updateUserDto.Passwd,
+            updateUserDto.Nombre,
+            updateUserDto.Apellido,
+            updateUserDto.RoleId,
+            updateUserDto.Codigofacultad,
+            CreatedAd: existingUser.CreatedAd,
+            UpdatedAt: DateTime.Now
+        );
+
+        _userService.EditUser(id, updateUser);
         _userService.SaveChanges();
-        return Ok(userDto);
+        return Ok(updateUser);
     }
 
     [HttpDelete("{id}")]

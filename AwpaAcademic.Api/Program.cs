@@ -9,14 +9,14 @@ using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllers();
-
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IUserMapper, UserMapper>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 {
+    // configure services (DI)
+    builder.Services.AddControllers();
+
+    builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<IUserMapper, UserMapper>();
+    builder.Services.AddScoped<IUserRepository, UserRepository>();
+
     // add database connection
     var connString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<AwpaAcademicDbContext>(options =>
