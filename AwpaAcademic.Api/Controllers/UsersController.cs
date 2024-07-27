@@ -109,6 +109,7 @@ public class UsersController : ControllerBase
             return NotFound("User Not Fuond!!!!!");
         }
 
+        await _userService.SaveChangesAsync();
         return Ok("User Deleted Sucessfuly");
     }
 

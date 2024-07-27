@@ -26,8 +26,8 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task DeleteUserAsync(User user)
     {
-        _awpaAcademicDbContext.Remove(user);
-        await _awpaAcademicDbContext.SaveChangesAsync();
+        await Task.Run(() => _awpaAcademicDbContext.Remove(user));
+
     }
 
     public async Task<bool> EditUserAsync(int Id, User user)

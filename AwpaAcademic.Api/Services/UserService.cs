@@ -18,8 +18,8 @@ public class UserService : IUserService
 
     public async Task<List<UserDto>> GetAllAsync()
     {
-        List<User> _users = await _userRepository.GetAllAsync();
-        List<UserDto> users = _users.Select(u => _userMapper.MapToUserDto(u)).ToList();
+        List<User> userEntity = await _userRepository.GetAllAsync();
+        List<UserDto> users = userEntity.Select(u => _userMapper.MapToUserDto(u)).ToList();
         return users;
     }
 
