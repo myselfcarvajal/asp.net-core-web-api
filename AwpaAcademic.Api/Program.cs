@@ -1,4 +1,5 @@
 using AwpaAcademic.Api.Data;
+using AwpaAcademic.Api.Infrastructure;
 using AwpaAcademic.Api.Mappers;
 using AwpaAcademic.Api.Mappers.Contracts;
 using AwpaAcademic.Api.Repositories;
@@ -11,11 +12,15 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 {
     // configure services (DI)
+    builder.Services.AddProblemDetails();
+
     builder.Services.AddControllers();
 
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IUserMapper, UserMapper>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
     // add database connection
     var connString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -25,6 +30,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var app = builder.Build();
 {
+    app.UseExceptionHandler();
     app.MapControllers();
     app.Run();
 }
