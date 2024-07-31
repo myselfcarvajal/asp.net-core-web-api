@@ -44,30 +44,23 @@ public class UsersController : ControllerBase
         }
         else
         {
-            try
-            {
-                // Convertir CreateUserDto a UserDto
-                UserDto newUser = new
-                (
-                    createUserDto.Id,
-                    createUserDto.Email,
-                    createUserDto.Passwd,
-                    createUserDto.Nombre,
-                    createUserDto.Apellido,
-                    createUserDto.RoleId,
-                    createUserDto.Codigofacultad,
-                    DateTime.Now,
-                    DateTime.Now
-                );
-                User addUser = await _userService.AddUserAsync(newUser);
-                await _userService.SaveChangesAsync();
-                UserDto userDtoResult = _userMapper.MapToUserDto(addUser);
-                return Ok(userDtoResult);
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e);
-            }
+            // Convertir CreateUserDto a UserDto
+            UserDto newUser = new
+            (
+                createUserDto.Id,
+                createUserDto.Email,
+                createUserDto.Passwd,
+                createUserDto.Nombre,
+                createUserDto.Apellido,
+                createUserDto.RoleId,
+                createUserDto.Codigofacultad,
+                DateTime.Now,
+                DateTime.Now
+            );
+
+            User addUser = await _userService.AddUserAsync(newUser);
+            UserDto userDtoResult = _userMapper.MapToUserDto(addUser);
+            return Ok(userDtoResult);
         }
     }
 
@@ -96,7 +89,6 @@ public class UsersController : ControllerBase
         );
 
         await _userService.EditUserAsync(id, updateUser);
-        await _userService.SaveChangesAsync();
         return Ok(updateUser);
     }
 

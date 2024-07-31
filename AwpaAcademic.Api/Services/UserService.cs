@@ -3,6 +3,8 @@ using AwpaAcademic.Api.Models.Dtos;
 using AwpaAcademic.Api.Models.Entities;
 using AwpaAcademic.Api.Repositories.Contracts;
 using AwpaAcademic.Api.Services.Contracts;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace AwpaAcademic.Api.Services;
 
@@ -36,14 +38,56 @@ public class UserService : IUserService
 
     public async Task<User> AddUserAsync(UserDto userDto)
     {
-        User userEntity = _userMapper.MapToUser(userDto);
-        return await _userRepository.AddUserAsync(userEntity);
+        try
+        {
+            User userEntity = _userMapper.MapToUser(userDto);
+
+            await _userRepository.AddUserAsync(userEntity);
+            await SaveChangesAsync();
+            return userEntity;
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
+        {
+            if (sqlEx.Number == 2601 || sqlEx.Number == 2627)
+            {
+                if (sqlEx.Message.Contains("PK_Users"))
+                {
+                    throw new InvalidOperationException("User id already exists.", ex);
+                }
+                else if (sqlEx.Message.Contains("IX_Users_Email"))
+                {
+                    throw new InvalidOperationException("Email address already exists.", ex);
+                }
+            }
+            throw;
+        }
     }
 
     public async Task<bool> EditUserAsync(int id, UserDto userDto)
     {
-        User userEntity = _userMapper.MapToUser(userDto);
-        return await _userRepository.EditUserAsync(id, userEntity);
+        try
+        {
+            User userEntity = _userMapper.MapToUser(userDto);
+
+            bool result = await _userRepository.EditUserAsync(id, userEntity);
+            await SaveChangesAsync();
+            return result;
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
+        {
+            if (sqlEx.Number == 2601 || sqlEx.Number == 2627)
+            {
+                if (sqlEx.Message.Contains("PK_Users"))
+                {
+                    throw new InvalidOperationException("User id already exists.", ex);
+                }
+                else if (sqlEx.Message.Contains("IX_Users_Email"))
+                {
+                    throw new InvalidOperationException("Email address already exists.", ex);
+                }
+            }
+            throw;
+        }
     }
 
     public async Task<bool> DeleteUserAsync(int id)
