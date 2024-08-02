@@ -77,7 +77,7 @@ public class UsersController : ControllerBase
 
         UserDto updateUser = new
         (
-            updateUserDto.Id,
+            Id: id,
             updateUserDto.Email,
             updateUserDto.Passwd,
             updateUserDto.Nombre,
