@@ -16,7 +16,9 @@ public class UserRepository : BaseRepository, IUserRepository
 
     public async Task<List<User>> GetAllAsync()
     {
-        return await _awpaAcademicDbContext.Users.ToListAsync();
+        return await _awpaAcademicDbContext.Users
+        .Include(u => u.Facultad)
+        .ToListAsync();
     }
 
     public async Task<User?> GetByIdAsync(int id)

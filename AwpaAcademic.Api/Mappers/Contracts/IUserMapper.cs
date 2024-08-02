@@ -7,4 +7,5 @@ public interface IUserMapper
 {
     public User MapToUser(UserDto userDto);
     public UserDto MapToUserDto(User user);
+    public UsersDto MapToUsersDto(User user);
 }

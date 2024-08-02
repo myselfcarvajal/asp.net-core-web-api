@@ -5,7 +5,7 @@ namespace AwpaAcademic.Api.Services.Contracts;
 
 public interface IUserService
 {
-    Task<List<UserDto>> GetAllAsync();
+    Task<List<UsersDto>> GetAllAsync();
     Task<UserDto?> GetByIdAsync(int id);
 
     Task<User> AddUserAsync(UserDto userDto);

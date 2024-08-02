@@ -22,7 +22,7 @@ public class UsersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> GetUsers()
     {
-        ResultDto<List<UserDto>> result = new ResultDto<List<UserDto>>();
+        ResultDto<List<UsersDto>> result = new ResultDto<List<UsersDto>>();
         result.Results = await _userService.GetAllAsync();
         result.StatusCode = Ok().StatusCode;
         return Ok(result);

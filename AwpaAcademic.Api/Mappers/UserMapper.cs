@@ -38,4 +38,22 @@ public class UserMapper : IUserMapper
             user.UpdatedAt
         );
     }
+
+    public UsersDto MapToUsersDto(User user)
+    {
+        return new(
+            user.Id,
+            user.Email,
+            user.Passwd,
+            user.Nombre,
+            user.Apellido,
+            user.RoleId,
+            user.Facultad == null ? null : new FacultadDto(
+                user.Facultad.CodigoFacultad,
+                user.Facultad.NombreFacultad
+            ),
+            user.CreatedAd,
+            user.UpdatedAt
+        );
+    }
 }
