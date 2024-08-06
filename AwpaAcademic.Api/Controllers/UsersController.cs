@@ -35,6 +35,27 @@ public class UsersController : ControllerBase
         return user == null ? NotFound() : Ok(user);
     }
 
+    [HttpGet("{id}/publicaciones")]
+    public async Task<ActionResult> GetPublicacionesByUserIdAsync([FromRoute] int id)
+    {
+        UserDto? user = await _userService.GetByIdAsync(id);
+
+        if (user == null)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = "Not Found",
+                Detail = $"User with id {id} not found"
+            };
+            return NotFound(problemDetails);
+        }
+
+        List<PublicacionesDto> publicaciones = await _userService.GetPublicacionesByUserIdAsync(id);
+
+        return Ok(publicaciones);
+    }
+
     [HttpPost]
     public async Task<ActionResult> AddUser([FromBody] CreateUserDto createUserDto)
     {

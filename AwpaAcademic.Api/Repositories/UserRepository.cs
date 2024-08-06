@@ -26,6 +26,17 @@ public class UserRepository : BaseRepository, IUserRepository
         return await _awpaAcademicDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 
+    public async Task<List<Publicacion>> GetPublicacionesByUserIdAsync(int id)
+    {
+        return await _awpaAcademicDbContext.Publicaciones
+        .Where(p => p.UserId == id)
+        .Include(u => u.Facultad)
+        .Include(u => u.User)
+
+        // .Select(p => (Publicacion?)p)
+        .ToListAsync();
+    }
+
     public async Task DeleteUserAsync(User user)
     {
         await Task.Run(() => _awpaAcademicDbContext.Remove(user));

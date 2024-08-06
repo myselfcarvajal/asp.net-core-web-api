@@ -12,10 +12,12 @@ public class UserService : IUserService
 {
     public readonly IUserRepository _userRepository;
     public readonly IUserMapper _userMapper;
-    public UserService(IUserRepository userRepository, IUserMapper userMapper)
+    public readonly IPublicacionMapper _publicacionMapper;
+    public UserService(IUserRepository userRepository, IUserMapper userMapper, IPublicacionMapper publicacionMapper)
     {
         _userRepository = userRepository;
         _userMapper = userMapper;
+        _publicacionMapper = publicacionMapper;
     }
 
     public async Task<List<UsersDto>> GetAllAsync()
@@ -34,6 +36,13 @@ public class UserService : IUserService
         }
         UserDto userDto = _userMapper.MapToUserDto(user);
         return userDto;
+    }
+
+    public async Task<List<PublicacionesDto>> GetPublicacionesByUserIdAsync(int id)
+    {
+        List<Publicacion> publicacionEntity = await _userRepository.GetPublicacionesByUserIdAsync(id);
+        List<PublicacionesDto> publicaciones = publicacionEntity.Select(p => _publicacionMapper.MapToPublicacionesDto(p)).ToList();
+        return publicaciones;
     }
 
     public async Task<User> AddUserAsync(UserDto userDto)
