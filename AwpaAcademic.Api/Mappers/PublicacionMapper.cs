@@ -10,6 +10,7 @@ public class PublicacionMapper : IPublicacionMapper
     {
         return new Publicacion()
         {
+            IdPublicacion = publicacionDto.IdPublicacion,
             Titulo = publicacionDto.Titulo,
             Autor = publicacionDto.Autor,
             Descripcion = publicacionDto.Descripcion,
@@ -25,6 +26,7 @@ public class PublicacionMapper : IPublicacionMapper
     public PublicacionDto MapToPublicacionDto(Publicacion publicacion)
     {
         return new(
+            publicacion.IdPublicacion,
             publicacion.Titulo,
             publicacion.Autor,
             publicacion.Descripcion,

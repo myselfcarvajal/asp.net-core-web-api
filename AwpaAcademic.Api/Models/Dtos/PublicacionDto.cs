@@ -1,9 +1,9 @@
-﻿using AwpaAcademic.Api.Models.Entities;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AwpaAcademic.Api.Models.Dtos;
 
 public record class PublicacionDto(
-    // Guid IdPublicacion,
+    Guid IdPublicacion,
     string Titulo,
     string Autor,
     string Descripcion,
@@ -36,4 +36,22 @@ public record class UserDetailsInPublicacionDto(
     string Nombre,
     string Apellido,
     string Codigofacultad
+);
+
+public record class CreatePublicacionDto(
+    [Required][StringLength(100)] string Titulo,
+    [Required][StringLength(150)] string Autor,
+    [Required][StringLength(500)] string Descripcion,
+    [Required][StringLength(200)][Url] string Url,
+    [Required] int UserId,
+    [Required] string CodigoFacultad
+);
+
+public record class UpdatePublicacionDto(
+    [Required][StringLength(100)] string Titulo,
+    [Required][StringLength(150)] string Autor,
+    [Required][StringLength(500)] string Descripcion,
+    [Required][StringLength(200)][Url] string Url,
+    [Required] int UserId,
+    [Required] string CodigoFacultad
 );

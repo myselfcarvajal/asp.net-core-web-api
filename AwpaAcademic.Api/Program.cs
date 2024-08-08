@@ -19,8 +19,11 @@ var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IUserMapper, UserMapper>();
-    builder.Services.AddScoped<IPublicacionMapper, PublicacionMapper>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+    builder.Services.AddScoped<IPublicacionService, PublicacionService>();
+    builder.Services.AddScoped<IPublicacionMapper, PublicacionMapper>();
+    builder.Services.AddScoped<IPublicacionRepository, PublicacionRepository>();
 
     // add database connection
     var connString = builder.Configuration.GetConnectionString("DefaultConnection");
