@@ -3,6 +3,8 @@ using AwpaAcademic.Api.Models.Dtos;
 using AwpaAcademic.Api.Models.Entities;
 using AwpaAcademic.Api.Repositories.Contracts;
 using AwpaAcademic.Api.Services.Contracts;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 
 namespace AwpaAcademic.Api.Services;
 
@@ -37,11 +39,27 @@ public class PublicacionService : IPublicacionService
 
     public async Task<Publicacion> AddPublicacionAsync(PublicacionDto publicacionDto)
     {
-        Publicacion publicacionEntity = _publicacionMapper.MapToPublicacion(publicacionDto);
+        try
+        {
+            Publicacion publicacionEntity = _publicacionMapper.MapToPublicacion(publicacionDto);
 
-        await _publicacionRepository.AddPublicacionAsync(publicacionEntity);
-        await SaveChangesAsync();
-        return publicacionEntity;
+            await _publicacionRepository.AddPublicacionAsync(publicacionEntity);
+            await SaveChangesAsync();
+            return publicacionEntity;
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
+        {
+            if (sqlEx.Message.Contains("FK_Publicaciones_Users_UserId"))
+            {
+                throw new InvalidOperationException("The UserId provided does not exist.", ex);
+            }
+            else if (sqlEx.Message.Contains("FK_Publicaciones_Facultades_CodigoFacultad"))
+            {
+                throw new InvalidOperationException("The CodigoFacultad provided does not exist.", ex);
+            }
+            throw;
+        }
+
     }
 
     public async Task<bool> EditPublicacionAsync(Guid idPublicacion, PublicacionDto publicacionDto)
@@ -54,9 +72,16 @@ public class PublicacionService : IPublicacionService
             await SaveChangesAsync();
             return result;
         }
-        catch (Exception)
+        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
         {
-
+            if (sqlEx.Message.Contains("FK_Publicaciones_Users_UserId"))
+            {
+                throw new InvalidOperationException("The UserId provided does not exist.", ex);
+            }
+            else if (sqlEx.Message.Contains("FK_Publicaciones_Facultades_CodigoFacultad"))
+            {
+                throw new InvalidOperationException("The CodigoFacultad provided does not exist.", ex);
+            }
             throw;
         }
 
