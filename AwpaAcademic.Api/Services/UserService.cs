@@ -3,19 +3,22 @@ using AwpaAcademic.Api.Models.Dtos;
 using AwpaAcademic.Api.Models.Entities;
 using AwpaAcademic.Api.Repositories.Contracts;
 using AwpaAcademic.Api.Services.Contracts;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 
 namespace AwpaAcademic.Api.Services;
 
 public class UserService : IUserService
 {
     public readonly IUserRepository _userRepository;
+    public readonly IFacultadRepository _facultadRepository;
     public readonly IUserMapper _userMapper;
     public readonly IPublicacionMapper _publicacionMapper;
-    public UserService(IUserRepository userRepository, IUserMapper userMapper, IPublicacionMapper publicacionMapper)
+    public UserService(IUserRepository userRepository,
+        IFacultadRepository facultadRepository,
+        IUserMapper userMapper,
+        IPublicacionMapper publicacionMapper)
     {
         _userRepository = userRepository;
+        _facultadRepository = facultadRepository;
         _userMapper = userMapper;
         _publicacionMapper = publicacionMapper;
     }
@@ -47,56 +50,52 @@ public class UserService : IUserService
 
     public async Task<User> AddUserAsync(UserDto userDto)
     {
-        try
+        if (await _userRepository.ExistsAsync(userDto.Id))
         {
-            User userEntity = _userMapper.MapToUser(userDto);
+            throw new InvalidOperationException("User id already exists.");
+        }
 
-            await _userRepository.AddUserAsync(userEntity);
-            await SaveChangesAsync();
-            return userEntity;
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
+        if (await _userRepository.GetByEmailAsync(userDto.Email) != null)
         {
-            if (sqlEx.Number == 2601 || sqlEx.Number == 2627)
-            {
-                if (sqlEx.Message.Contains("PK_Users"))
-                {
-                    throw new InvalidOperationException("User id already exists.", ex);
-                }
-                else if (sqlEx.Message.Contains("IX_Users_Email"))
-                {
-                    throw new InvalidOperationException("Email address already exists.", ex);
-                }
-            }
-            throw;
+            throw new InvalidOperationException("Email already exists.");
         }
+
+        if (await _facultadRepository.GetByIdAsync(userDto.Codigofacultad) == null)
+        {
+            throw new InvalidOperationException("Codigofacultad doesn't exist.");
+        }
+
+        User userEntity = _userMapper.MapToUser(userDto);
+
+        await _userRepository.AddUserAsync(userEntity);
+        await SaveChangesAsync();
+
+        return userEntity;
     }
 
     public async Task<bool> EditUserAsync(int id, UserDto userDto)
     {
-        try
-        {
-            User userEntity = _userMapper.MapToUser(userDto);
+        // Obtener el usuario con el mismo email
+        var existingUserWithEmail = await _userRepository.GetByEmailAsync(userDto.Email);
 
-            bool result = await _userRepository.EditUserAsync(id, userEntity);
-            await SaveChangesAsync();
-            return result;
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
+        // Validar si el email ya está en uso por otro usuario.
+        if (existingUserWithEmail != null && existingUserWithEmail.Id != id)
         {
-            if (sqlEx.Number == 2601 || sqlEx.Number == 2627)
-            {
-                if (sqlEx.Message.Contains("PK_Users"))
-                {
-                    throw new InvalidOperationException("User id already exists.", ex);
-                }
-                else if (sqlEx.Message.Contains("IX_Users_Email"))
-                {
-                    throw new InvalidOperationException("Email address already exists.", ex);
-                }
-            }
-            throw;
+            throw new InvalidOperationException("Email address already exists.");
         }
+
+        // Validar si facultad no existe.
+        if (await _facultadRepository.GetByIdAsync(userDto.Codigofacultad) == null)
+        {
+            throw new InvalidOperationException("Codigofacultad doesn't exist.");
+        }
+
+        User userEntity = _userMapper.MapToUser(userDto);
+
+        bool result = await _userRepository.EditUserAsync(id, userEntity);
+        await SaveChangesAsync();
+
+        return result;
     }
 
     public async Task<bool> DeleteUserAsync(int id)

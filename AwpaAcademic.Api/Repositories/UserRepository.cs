@@ -21,9 +21,19 @@ public class UserRepository : BaseRepository, IUserRepository
         .ToListAsync();
     }
 
+    public Task<bool> ExistsAsync(int id)
+    {
+        return _awpaAcademicDbContext.Users.AnyAsync(u => u.Id == id);
+    }
+
     public async Task<User?> GetByIdAsync(int id)
     {
         return await _awpaAcademicDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
+    }
+
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        return await _awpaAcademicDbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
     public async Task<List<Publicacion>> GetPublicacionesByUserIdAsync(int id)
