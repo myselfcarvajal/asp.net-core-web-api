@@ -26,6 +26,11 @@ public class FacultadRepository : BaseRepository, IFacultadRepository
         .FirstOrDefaultAsync(f => f.CodigoFacultad == codigoFacultad);
     }
 
+    public Task<bool> ExistsAsync(string codigoFacultad)
+    {
+        return _awpaAcademicDbContext.Facultades.AnyAsync(f => f.CodigoFacultad == codigoFacultad);
+    }
+
     public async Task<Facultad> AddFacultadAsync(Facultad facultad)
     {
         EntityEntry<Facultad> x = await _awpaAcademicDbContext.AddAsync(facultad);

@@ -21,6 +21,8 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IUserMapper, UserMapper>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();
 
+    builder.Services.AddScoped<IFacultadService, FacultadService>();
+    builder.Services.AddScoped<IFacultadMapper, FacultadMapper>();
     builder.Services.AddScoped<IFacultadRepository, FacultadRepository>();
 
     builder.Services.AddScoped<IPublicacionService, PublicacionService>();

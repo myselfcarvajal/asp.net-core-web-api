@@ -26,6 +26,11 @@ public class UserRepository : BaseRepository, IUserRepository
         return _awpaAcademicDbContext.Users.AnyAsync(u => u.Id == id);
     }
 
+    public async Task<bool> ExistsWithFacultad(string codigoFacultad)
+    {
+        return await _awpaAcademicDbContext.Users.AnyAsync(u => u.Codigofacultad == codigoFacultad);
+    }
+
     public async Task<User?> GetByIdAsync(int id)
     {
         return await _awpaAcademicDbContext.Users.FirstOrDefaultAsync(u => u.Id == id);
