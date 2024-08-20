@@ -36,7 +36,7 @@ public class UsersController : ControllerBase
     }
 
     [HttpGet("{id}/publicaciones")]
-    public async Task<ActionResult> GetPublicacionesByUserIdAsync([FromRoute] int id)
+    public async Task<ActionResult> GetPublicacionesByUserId([FromRoute] int id)
     {
         UserDto? user = await _userService.GetByIdAsync(id);
 
