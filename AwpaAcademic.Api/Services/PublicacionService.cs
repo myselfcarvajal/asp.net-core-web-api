@@ -3,19 +3,25 @@ using AwpaAcademic.Api.Models.Dtos;
 using AwpaAcademic.Api.Models.Entities;
 using AwpaAcademic.Api.Repositories.Contracts;
 using AwpaAcademic.Api.Services.Contracts;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 
 namespace AwpaAcademic.Api.Services;
 
 public class PublicacionService : IPublicacionService
 {
     public readonly IPublicacionRepository _publicacionRepository;
+    public readonly IUserRepository _userRepository;
+    public readonly IFacultadRepository _facultadRepository;
     public readonly IPublicacionMapper _publicacionMapper;
 
-    public PublicacionService(IPublicacionRepository publicacionRepository, IPublicacionMapper publicacionMapper)
+    public PublicacionService(
+        IPublicacionRepository publicacionRepository,
+        IUserRepository userRepository,
+        IFacultadRepository facultadRepository,
+        IPublicacionMapper publicacionMapper)
     {
         _publicacionRepository = publicacionRepository;
+        _userRepository = userRepository;
+        _facultadRepository = facultadRepository;
         _publicacionMapper = publicacionMapper;
     }
 
@@ -39,52 +45,40 @@ public class PublicacionService : IPublicacionService
 
     public async Task<Publicacion> AddPublicacionAsync(PublicacionDto publicacionDto)
     {
-        try
+        if (!await _userRepository.ExistsAsync(publicacionDto.UserId))
         {
-            Publicacion publicacionEntity = _publicacionMapper.MapToPublicacion(publicacionDto);
-
-            await _publicacionRepository.AddPublicacionAsync(publicacionEntity);
-            await SaveChangesAsync();
-            return publicacionEntity;
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
-        {
-            if (sqlEx.Message.Contains("FK_Publicaciones_Users_UserId"))
-            {
-                throw new InvalidOperationException("The UserId provided does not exist.", ex);
-            }
-            else if (sqlEx.Message.Contains("FK_Publicaciones_Facultades_CodigoFacultad"))
-            {
-                throw new InvalidOperationException("The CodigoFacultad provided does not exist.", ex);
-            }
-            throw;
+            throw new InvalidOperationException("UserId doesn't exist.");
         }
 
+        if (await _facultadRepository.GetByIdAsync(publicacionDto.CodigoFacultad) == null)
+        {
+            throw new InvalidOperationException("Codigofacultad doesn't exist.");
+        }
+
+        Publicacion publicacionEntity = _publicacionMapper.MapToPublicacion(publicacionDto);
+
+        await _publicacionRepository.AddPublicacionAsync(publicacionEntity);
+        await SaveChangesAsync();
+        return publicacionEntity;
     }
 
     public async Task<bool> EditPublicacionAsync(Guid idPublicacion, PublicacionDto publicacionDto)
     {
-        try
+        if (!await _userRepository.ExistsAsync(publicacionDto.UserId))
         {
-            Publicacion publicacionEntity = _publicacionMapper.MapToPublicacion(publicacionDto);
-
-            bool result = await _publicacionRepository.EditPublicacionAsync(idPublicacion, publicacionEntity);
-            await SaveChangesAsync();
-            return result;
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException sqlEx)
-        {
-            if (sqlEx.Message.Contains("FK_Publicaciones_Users_UserId"))
-            {
-                throw new InvalidOperationException("The UserId provided does not exist.", ex);
-            }
-            else if (sqlEx.Message.Contains("FK_Publicaciones_Facultades_CodigoFacultad"))
-            {
-                throw new InvalidOperationException("The CodigoFacultad provided does not exist.", ex);
-            }
-            throw;
+            throw new InvalidOperationException("UserId doesn't exist.");
         }
 
+        if (await _facultadRepository.GetByIdAsync(publicacionDto.CodigoFacultad) == null)
+        {
+            throw new InvalidOperationException("Codigofacultad doesn't exist.");
+        }
+
+        Publicacion publicacionEntity = _publicacionMapper.MapToPublicacion(publicacionDto);
+
+        bool result = await _publicacionRepository.EditPublicacionAsync(idPublicacion, publicacionEntity);
+        await SaveChangesAsync();
+        return result;
     }
 
     public async Task<bool> DeletePublicacionAsync(Guid idPublicacion)
