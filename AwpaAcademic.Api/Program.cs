@@ -7,6 +7,7 @@ using AwpaAcademic.Api.Repositories.Contracts;
 using AwpaAcademic.Api.Services;
 using AwpaAcademic.Api.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,10 +34,33 @@ var builder = WebApplication.CreateBuilder(args);
     var connString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<AwpaAcademicDbContext>(options =>
         options.UseSqlServer(connString));
+
+    // configure Swagger
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Title = "AwpaAcademic API",
+            Version = "v1",
+            Description = "API para AwpaAcademic"
+        });
+    });
 }
 
 var app = builder.Build();
 {
+    // config pipeline Swagger
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json",
+                "AwpaAcademic API v1");
+            c.RoutePrefix = string.Empty;
+        });
+    }
     app.UseExceptionHandler();
     app.MapControllers();
     app.Run();
