@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using AwpaAcademic.Api.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AwpaAcademic.Api.Infrastructure;
@@ -13,7 +15,8 @@ public class GlobalExceptionHandler : IExceptionHandler
         var problemDetails = new ProblemDetails
         {
             Status = StatusCodes.Status500InternalServerError,
-            Title = "Server error"
+            Title = "Server error",
+            Instance = $"{httpContext.Request.Method} {httpContext.Request.Path}"
         };
 
         switch (exception)
@@ -22,6 +25,12 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";
                 problemDetails.Detail = invalidOpEx.Message;
+                break;
+            
+            case NotFoundException notFoundEx:
+                problemDetails.Status = StatusCodes.Status404NotFound;
+                problemDetails.Title = "Not Found";
+                problemDetails.Detail = notFoundEx.Message;
                 break;
 
             default:
@@ -32,6 +41,8 @@ public class GlobalExceptionHandler : IExceptionHandler
         }
 
         problemDetails.Type = "https://tools.ietf.org/html/rfc9110#section-15.5.5";
+        problemDetails.Extensions["requestId"] = httpContext.TraceIdentifier;
+        problemDetails.Extensions["traceId"] = httpContext.Features.Get<IHttpActivityFeature>()?.Activity?.Id;
         problemDetails.Status = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
         problemDetails.Title = problemDetails.Title ?? "An unexpected error occurred.";
 

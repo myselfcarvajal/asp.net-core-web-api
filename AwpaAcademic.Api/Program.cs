@@ -67,6 +67,7 @@ var app = builder.Build();
             c.RoutePrefix = string.Empty;
         });
     }
+
     app.UseExceptionHandler();
     app.MapControllers();
     app.Run();
