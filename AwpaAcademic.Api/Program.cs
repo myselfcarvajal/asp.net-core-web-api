@@ -33,7 +33,13 @@ var builder = WebApplication.CreateBuilder(args);
     // add database connection
     var connString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<AwpaAcademicDbContext>(options =>
-        options.UseSqlServer(connString));
+        options.UseSqlServer(connString, sqlOptions =>
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null
+            )
+        ));
 
     // configure Swagger
     builder.Services.AddEndpointsApiExplorer();
