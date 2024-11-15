@@ -8,9 +8,8 @@ public interface IUserService
     Task<List<UsersDto>> GetAllAsync();
     Task<UserDto?> GetByIdAsync(int id);
     Task<List<PublicacionesDto>> GetPublicacionesByUserIdAsync(int id);
-
-    Task<User> AddUserAsync(UserDto userDto);
+    Task<User> AddUserAsync(CreateUserDto createUserDto);
     Task<bool> DeleteUserAsync(int id);
-    Task<bool> EditUserAsync(int Id, UserDto userDto);
+    Task<bool> EditUserAsync(int id, UpdateUserDto updateUserDto);
     Task SaveChangesAsync();
 }

@@ -32,98 +32,35 @@ public class UsersController : ControllerBase
     public async Task<ActionResult> GetUserById([FromRoute] int id)
     {
         UserDto? user = await _userService.GetByIdAsync(id);
-        return user == null ? NotFound() : Ok(user);
+        return Ok(user);
     }
 
     [HttpGet("{id}/publicaciones")]
     public async Task<ActionResult> GetPublicacionesByUserId([FromRoute] int id)
     {
-        UserDto? user = await _userService.GetByIdAsync(id);
-
-        if (user == null)
-        {
-            var problemDetails = new ProblemDetails
-            {
-                Status = StatusCodes.Status404NotFound,
-                Title = "Not Found",
-                Detail = $"User with id {id} not found"
-            };
-            return NotFound(problemDetails);
-        }
-
         List<PublicacionesDto> publicaciones = await _userService.GetPublicacionesByUserIdAsync(id);
-
         return Ok(publicaciones);
     }
 
     [HttpPost]
     public async Task<ActionResult> AddUser([FromBody] CreateUserDto createUserDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest("Please add User");
-        }
-        else
-        {
-            // Convertir CreateUserDto a UserDto
-            UserDto newUser = new
-            (
-                createUserDto.Id,
-                createUserDto.Email,
-                createUserDto.Passwd,
-                createUserDto.Nombre,
-                createUserDto.Apellido,
-                createUserDto.RoleId,
-                createUserDto.Codigofacultad,
-                DateTime.Now,
-                DateTime.Now
-            );
-
-            User addUser = await _userService.AddUserAsync(newUser);
-            UserDto userDtoResult = _userMapper.MapToUserDto(addUser);
-            return Ok(userDtoResult);
-        }
+        User addUser = await _userService.AddUserAsync(createUserDto);
+        UserDto result = _userMapper.MapToUserDto(addUser);
+        return Ok(result);
     }
 
     [HttpPut("{id}")]
     public async Task<ActionResult> EditUser([FromRoute] int id, [FromBody] UpdateUserDto updateUserDto)
     {
-
-        UserDto? existingUser = await _userService.GetByIdAsync(id);
-
-        if (existingUser == null)
-        {
-            return NotFound("User Not Found!!!!!");
-        }
-
-        UserDto updateUser = new
-        (
-            Id: id,
-            updateUserDto.Email,
-            updateUserDto.Passwd,
-            updateUserDto.Nombre,
-            updateUserDto.Apellido,
-            updateUserDto.RoleId,
-            updateUserDto.Codigofacultad,
-            CreatedAd: existingUser.CreatedAd,
-            UpdatedAt: DateTime.Now
-        );
-
-        await _userService.EditUserAsync(id, updateUser);
-        return Ok(updateUser);
+        await _userService.EditUserAsync(id, updateUserDto);
+        return Ok(updateUserDto);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteUser([FromRoute] int id)
     {
-        bool isDeleted = await _userService.DeleteUserAsync(id);
-        if (!isDeleted)
-        {
-            return NotFound("User Not Fuond!!!!!");
-        }
-
-        await _userService.SaveChangesAsync();
-        return Ok("User Deleted Sucessfuly");
+        await _userService.DeleteUserAsync(id);
+        return Ok();
     }
-
 }
