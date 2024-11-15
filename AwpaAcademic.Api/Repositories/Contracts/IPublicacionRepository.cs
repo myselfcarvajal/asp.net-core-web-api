@@ -5,6 +5,7 @@ namespace AwpaAcademic.Api.Repositories.Contracts;
 public interface IPublicacionRepository
 {
     Task<List<Publicacion>> GetAllAsync();
+    Task<bool> ExistsAsync(Guid idPublicacion);
     Task<Publicacion?> GetByIdAsync(Guid idPublicacion);
     Task<Publicacion> AddPublicacionAsync(Publicacion publicacion);
     Task DeletePublicacionAsync(Publicacion publicacion);

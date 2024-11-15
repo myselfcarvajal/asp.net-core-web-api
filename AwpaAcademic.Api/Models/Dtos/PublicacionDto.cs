@@ -39,20 +39,21 @@ public record class UserDetailsInPublicacionDto(
 );
 
 public record class CreatePublicacionDto(
-    [Required][StringLength(100)] string Titulo,
-    [Required][StringLength(150)] string Autor,
-    [Required][StringLength(500)] string Descripcion,
-    [Required][StringLength(200)][Url] string Url,
+    [Required] [StringLength(100)] string Titulo,
+    [Required] [StringLength(150)] string Autor,
+    [Required] [StringLength(500)] string Descripcion,
+    [Required] [StringLength(200)] [Url] string Url,
     [Range(1, int.MaxValue, ErrorMessage = "The UserId field is required. Value must be between {1} and {2}.")]
-    [Required] int UserId,
+    [Required]
+    int UserId,
     [Required] string CodigoFacultad
 );
 
 public record class UpdatePublicacionDto(
-    [Required][StringLength(100)] string Titulo,
-    [Required][StringLength(150)] string Autor,
-    [Required][StringLength(500)] string Descripcion,
-    [Required][StringLength(200)][Url] string Url,
+    [Required] [StringLength(100)] string Titulo,
+    [Required] [StringLength(150)] string Autor,
+    [Required] [StringLength(500)] string Descripcion,
+    [Required] [StringLength(200)] [Url] string Url,
     [Required] int UserId,
     [Required] string CodigoFacultad
 );

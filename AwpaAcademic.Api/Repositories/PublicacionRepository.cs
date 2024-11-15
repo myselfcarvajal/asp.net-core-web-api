@@ -9,6 +9,7 @@ namespace AwpaAcademic.Api.Repositories;
 public class PublicacionRepository : BaseRepository, IPublicacionRepository
 {
     private AwpaAcademicDbContext _awpaAcademicDbContext;
+
     public PublicacionRepository(AwpaAcademicDbContext awpaAcademicDbContext) : base(awpaAcademicDbContext)
     {
         _awpaAcademicDbContext = awpaAcademicDbContext;
@@ -17,15 +18,20 @@ public class PublicacionRepository : BaseRepository, IPublicacionRepository
     public async Task<List<Publicacion>> GetAllAsync()
     {
         return await _awpaAcademicDbContext.Publicaciones
-        .Include(p => p.User)
-        .Include(p => p.Facultad)
-        .ToListAsync();
+            .Include(p => p.User)
+            .Include(p => p.Facultad)
+            .ToListAsync();
+    }
+
+    public async Task<bool> ExistsAsync(Guid idPublicacion)
+    {
+        return await _awpaAcademicDbContext.Publicaciones.AnyAsync(p => p.IdPublicacion == idPublicacion);
     }
 
     public async Task<Publicacion?> GetByIdAsync(Guid idPublicacion)
     {
         return await _awpaAcademicDbContext.Publicaciones
-        .FirstOrDefaultAsync(p => p.IdPublicacion == idPublicacion);
+            .FirstOrDefaultAsync(p => p.IdPublicacion == idPublicacion);
     }
 
     public async Task DeletePublicacionAsync(Publicacion publicacion)

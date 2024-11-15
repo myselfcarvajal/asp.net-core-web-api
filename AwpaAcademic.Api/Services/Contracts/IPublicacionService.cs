@@ -7,8 +7,8 @@ public interface IPublicacionService
 {
     Task<List<PublicacionesDto>> GetAllAsync();
     Task<PublicacionDto?> GetByIdAsync(Guid idPublicacion);
-    Task<Publicacion> AddPublicacionAsync(PublicacionDto publicacion);
+    Task<Publicacion> AddPublicacionAsync(CreatePublicacionDto createPublicacionDto);
     Task<bool> DeletePublicacionAsync(Guid idPublicacion);
-    Task<bool> EditPublicacionAsync(Guid idPublicacion, PublicacionDto publicacion);
+    Task<bool> EditPublicacionAsync(Guid idPublicacion, UpdatePublicacionDto updatePublicacionDto);
     Task SaveChangesAsync();
 }
