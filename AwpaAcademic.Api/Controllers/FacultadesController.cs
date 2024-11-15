@@ -1,3 +1,4 @@
+using AwpaAcademic.Api.Exceptions;
 using AwpaAcademic.Api.Mappers.Contracts;
 using AwpaAcademic.Api.Models.Dtos;
 using AwpaAcademic.Api.Models.Entities;
@@ -34,59 +35,30 @@ public class FacultadesController : ControllerBase
     public async Task<IActionResult> GetFacultadById([FromRoute] string codigoFacultad)
     {
         FacultadDto? facultad = await _facultadService.GetByIdAsync(codigoFacultad);
-        return facultad == null ? NotFound() : Ok(facultad);
+        return Ok(facultad);
     }
 
     [HttpPost]
-    public async Task<IActionResult> AddFacultad([FromBody] CreateFacultadDto createFacultadDto)
+    public async Task<IActionResult> AddFacultad([FromBody] FacultadDto facultadDto)
     {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest("Please add Facultad");
-        }
-
-        FacultadDto newFacultad = new
-        (
-            createFacultadDto.CodigoFacultad,
-            createFacultadDto.NombreFacultad
-        );
-
-
-        Facultad addFacultad =
-        await _facultadService.AddFacultadAsync(newFacultad);
-        FacultadDto facultadDtoResult = _facultadMapper.MapToFacultadDto(addFacultad);
-        return Ok(facultadDtoResult);
+        Facultad facultad =
+            await _facultadService.AddFacultadAsync(facultadDto);
+        FacultadDto result = _facultadMapper.MapToFacultadDto(facultad);
+        return Ok(result);
     }
 
     [HttpPut("{codigoFacultad}")]
-    public async Task<IActionResult> EditFacultad([FromRoute] string codigoFacultad, [FromBody] UpdateFacultadDto updateFacultadDto)
+    public async Task<IActionResult> EditFacultad([FromRoute] string codigoFacultad,
+        [FromBody] FacultadDto facultadDto)
     {
-        FacultadDto? existingFacultad = await _facultadService.GetByIdAsync(codigoFacultad);
-        if (existingFacultad == null)
-        {
-            return NotFound("Facultad Not Found!!!!!");
-        }
-
-        FacultadDto updateFacultad = new
-        (
-            CodigoFacultad: codigoFacultad,
-            updateFacultadDto.NombreFacultad
-        );
-
-        await _facultadService.EditFacultadAsync(codigoFacultad, updateFacultad);
-        return Ok(updateFacultad);
+        await _facultadService.EditFacultadAsync(codigoFacultad, facultadDto);
+        return Ok(facultadDto);
     }
 
     [HttpDelete("{codigoFacultad}")]
     public async Task<IActionResult> DeleteFacultad([FromRoute] string codigoFacultad)
     {
-        bool isDeleted = await _facultadService.DeleteFacultadAsync(codigoFacultad);
-        if (!isDeleted)
-        {
-            return NotFound("Facultad Not Fuond!!!!!");
-        }
-
-        await _facultadService.SaveChangesAsync();
-        return Ok("Facultad Deleted Sucessfuly");
+        await _facultadService.DeleteFacultadAsync(codigoFacultad);
+        return Ok();
     }
 }

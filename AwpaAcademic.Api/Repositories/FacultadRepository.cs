@@ -9,6 +9,7 @@ namespace AwpaAcademic.Api.Repositories;
 public class FacultadRepository : BaseRepository, IFacultadRepository
 {
     private AwpaAcademicDbContext _awpaAcademicDbContext;
+
     public FacultadRepository(AwpaAcademicDbContext awpaAcademicDbContext)
         : base(awpaAcademicDbContext)
     {
@@ -23,12 +24,12 @@ public class FacultadRepository : BaseRepository, IFacultadRepository
     public async Task<Facultad?> GetByIdAsync(string codigoFacultad)
     {
         return await _awpaAcademicDbContext.Facultades
-        .FirstOrDefaultAsync(f => f.CodigoFacultad == codigoFacultad);
+            .FirstOrDefaultAsync(f => f.CodigoFacultad == codigoFacultad);
     }
 
-    public Task<bool> ExistsAsync(string codigoFacultad)
+    public async Task<bool> ExistsAsync(string codigoFacultad)
     {
-        return _awpaAcademicDbContext.Facultades.AnyAsync(f => f.CodigoFacultad == codigoFacultad);
+        return await _awpaAcademicDbContext.Facultades.AnyAsync(f => f.CodigoFacultad == codigoFacultad);
     }
 
     public async Task<Facultad> AddFacultadAsync(Facultad facultad)

@@ -1,3 +1,4 @@
+using AwpaAcademic.Api.Exceptions;
 using AwpaAcademic.Api.Mappers.Contracts;
 using AwpaAcademic.Api.Models.Dtos;
 using AwpaAcademic.Api.Models.Entities;
@@ -16,12 +17,11 @@ public class FacultadService : IFacultadService
         IFacultadRepository facultadRepository,
         IUserRepository userRepository,
         IFacultadMapper facultadMapper
-        )
+    )
     {
         _facultadRepository = facultadRepository;
         _userRepository = userRepository;
         _facultadMapper = facultadMapper;
-
     }
 
     public async Task<List<FacultadDto>> GetAllAsync()
@@ -36,8 +36,9 @@ public class FacultadService : IFacultadService
         Facultad? facultad = await _facultadRepository.GetByIdAsync(codigoFacultad);
         if (facultad == null)
         {
-            return null;
+            throw new NotFoundException($"No se encontró ninguna facultad con el código {codigoFacultad}.");
         }
+
         FacultadDto facultadDto = _facultadMapper.MapToFacultadDto(facultad);
         return facultadDto;
     }
@@ -46,7 +47,8 @@ public class FacultadService : IFacultadService
     {
         if (await _facultadRepository.ExistsAsync(facultadDto.CodigoFacultad))
         {
-            throw new InvalidOperationException("Facultad CodigoFacultad already exists.");
+            throw new InvalidOperationException(
+                $"Facultad with codigoFacultad {facultadDto.CodigoFacultad} already exists.");
         }
 
         Facultad facultadEntity = _facultadMapper.MapToFacultad(facultadDto);
@@ -58,6 +60,17 @@ public class FacultadService : IFacultadService
 
     public async Task<bool> EditFacultadAsync(string codigoFacultad, FacultadDto facultadDto)
     {
+        if (!await _facultadRepository.ExistsAsync(codigoFacultad))
+        {
+            throw new NotFoundException($"No se encontró ninguna facultad con el código {codigoFacultad}.");
+        }
+
+        if (codigoFacultad != facultadDto.CodigoFacultad)
+        {
+            throw new InvalidOperationException(
+                "El campo 'codigoFacultad' es inmutable y no puede ser modificado después de crear la facultad. Actualiza los demás campos.");
+        }
+
         Facultad facultadEntity = _facultadMapper.MapToFacultad(facultadDto);
 
         bool result = await _facultadRepository.EditFacultadAsync(codigoFacultad, facultadEntity);
@@ -72,15 +85,18 @@ public class FacultadService : IFacultadService
 
         if (hasAssociatedUsers)
         {
-            throw new InvalidOperationException("Facultad cannot be deleted because it has associated users");
+            throw new InvalidOperationException(
+                $"Facultad {codigoFacultad} cannot be deleted because it has associated users");
         }
 
         Facultad? facultad = await _facultadRepository.GetByIdAsync(codigoFacultad);
         if (facultad == null)
         {
-            return false;
+            throw new NotFoundException($"No se encontró ninguna facultad con el código {codigoFacultad}.");
         }
+
         await _facultadRepository.DeleteFacultadAsync(facultad);
+        await SaveChangesAsync();
         return true;
     }
 
