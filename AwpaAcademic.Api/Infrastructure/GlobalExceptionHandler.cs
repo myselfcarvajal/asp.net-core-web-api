@@ -22,12 +22,14 @@ public class GlobalExceptionHandler : IExceptionHandler
         switch (exception)
         {
             case InvalidOperationException invalidOpEx:
+                problemDetails.Type = "https://tools.ietf.org/html/rfc9110#section-15.5.10";
                 problemDetails.Status = StatusCodes.Status409Conflict;
                 problemDetails.Title = "Conflict";
                 problemDetails.Detail = invalidOpEx.Message;
                 break;
-            
+
             case NotFoundException notFoundEx:
+                problemDetails.Type = "https://tools.ietf.org/html/rfc9110#section-15.5.5";
                 problemDetails.Status = StatusCodes.Status404NotFound;
                 problemDetails.Title = "Not Found";
                 problemDetails.Detail = notFoundEx.Message;
@@ -40,7 +42,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                 break;
         }
 
-        problemDetails.Type = "https://tools.ietf.org/html/rfc9110#section-15.5.5";
+        problemDetails.Type = problemDetails.Type ?? "https://tools.ietf.org/html/rfc9110";
         problemDetails.Extensions["requestId"] = httpContext.TraceIdentifier;
         problemDetails.Extensions["traceId"] = httpContext.Features.Get<IHttpActivityFeature>()?.Activity?.Id;
         problemDetails.Status = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
