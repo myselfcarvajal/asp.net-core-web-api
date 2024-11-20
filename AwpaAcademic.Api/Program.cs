@@ -30,6 +30,9 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IPublicacionMapper, PublicacionMapper>();
     builder.Services.AddScoped<IPublicacionRepository, PublicacionRepository>();
 
+    builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
     // add database connection
     var connString = builder.Configuration.GetConnectionString("DefaultConnection");
     builder.Services.AddDbContext<AwpaAcademicDbContext>(options =>
