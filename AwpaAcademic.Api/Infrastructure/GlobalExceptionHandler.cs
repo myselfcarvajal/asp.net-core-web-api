@@ -35,6 +35,13 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Detail = notFoundEx.Message;
                 break;
 
+            case UnauthorizedException unauthorizedEx:
+                problemDetails.Type = "https://tools.ietf.org/html/rfc9110#section-15.5.2";
+                problemDetails.Status = StatusCodes.Status401Unauthorized;
+                problemDetails.Title = "Unauthorized";
+                problemDetails.Detail = unauthorizedEx.Message;
+                break;
+
             default:
                 problemDetails.Status = StatusCodes.Status500InternalServerError;
                 problemDetails.Title = "Server error";
