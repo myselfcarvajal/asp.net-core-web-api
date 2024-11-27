@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
     [HttpPost("signin")]
     public async Task<ActionResult> Signin([FromBody] SigninDto signinDto)
     {
-        await _authService.Singin(signinDto);
-        return Ok();
+        var token = await _authService.Singin(signinDto);
+        return Ok(new { Token = token });
     }
 }

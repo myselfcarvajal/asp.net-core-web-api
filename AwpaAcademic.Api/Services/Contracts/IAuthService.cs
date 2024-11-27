@@ -6,6 +6,6 @@ namespace AwpaAcademic.Api.Services.Contracts;
 public interface IAuthService
 {
     Task<User> RegisterUserAsync(RegisterUserDto registerUserDto);
-    Task<bool> Singin(SigninDto signinDto);
+    Task<string> Singin(SigninDto signinDto);
     Task SaveChangesAsync();
 }
