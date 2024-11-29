@@ -104,7 +104,7 @@ public class AuthService : IAuthService
             {
                 new Claim(ClaimTypes.NameIdentifier, id.ToString()),
                 new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Role, roleId.ToString()),
+                new Claim(ClaimTypes.Role, roleId == 1 ? "Admin" : "Docente"),
                 new Claim("CodigoFacultad", codigofacultad ?? string.Empty), // Claim personalised
             }),
             NotBefore = DateTime.UtcNow,

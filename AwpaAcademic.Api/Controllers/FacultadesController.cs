@@ -1,8 +1,8 @@
-using AwpaAcademic.Api.Exceptions;
 using AwpaAcademic.Api.Mappers.Contracts;
 using AwpaAcademic.Api.Models.Dtos;
 using AwpaAcademic.Api.Models.Entities;
 using AwpaAcademic.Api.Services.Contracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AwpaAcademic.Api.Controllers;
@@ -39,6 +39,7 @@ public class FacultadesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> AddFacultad([FromBody] FacultadDto facultadDto)
     {
         Facultad facultad =
@@ -48,6 +49,7 @@ public class FacultadesController : ControllerBase
     }
 
     [HttpPut("{codigoFacultad}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditFacultad([FromRoute] string codigoFacultad,
         [FromBody] FacultadDto facultadDto)
     {
@@ -56,6 +58,7 @@ public class FacultadesController : ControllerBase
     }
 
     [HttpDelete("{codigoFacultad}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteFacultad([FromRoute] string codigoFacultad)
     {
         await _facultadService.DeleteFacultadAsync(codigoFacultad);
